@@ -71,8 +71,6 @@ class VSCode(dotbot.Plugin):
             try:
                 if extension_status["status"] == "install":
                     code.install(extension)
-                elif extension_status["status"] == "uninstall":
-                    code.uninstall(extension)
                 else:
                     self._log.error("Error format, please refer to documentation.")
                     return False
