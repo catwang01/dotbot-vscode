@@ -1,10 +1,9 @@
 # coding: utf-8
 import os
 import sys
+from subprocess import call, run
+
 import dotbot
-
-from subprocess import check_output, call
-
 
 sys.path.append(
     os.path.join(os.path.dirname(os.path.realpath(__file__)), "lib", "whichcraft")
@@ -136,10 +135,13 @@ class VSCodeInstance(object):
     def installed_extensions(self):
         if not self.installed:
             raise VSCodeError("{} is not installed.".format(self._name))
-        output = check_output([self._binary, "--list-extensions"]).decode(
+        result = run([self._binary, "--list-extensions"], capture_output=True)
+        if result.returncode:
+            errorMessage = result.stderr.decode(sys.getdefaultencoding())
+            raise VSCodeError(f"Run into an error while executing vscodefile. Error: {errorMessage}")
+        output = result.stdout.decode(
             sys.getdefaultencoding()
         )
-
         return set(line.lower() for line in output.splitlines())
 
     def install(self, extension):
