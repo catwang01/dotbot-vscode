@@ -1,5 +1,6 @@
 # coding: utf-8
 import os
+import re
 import sys
 import dotbot
 
@@ -81,10 +82,21 @@ class VSCode(dotbot.Plugin):
                 return False
         return True
 
+
+    def _remove_comments(self, text: str) -> str:
+        replaced = re.sub(r'\s*#.*$', '', text)
+        print(f'{text =}')
+        print(f'{replaced =}')
+        return replaced
+
     def _vscodefile_extensions(self, vsfile):
         try:
+            result = []
             with open(vsfile) as f:
-                result = [e.strip().lower() for e in f.readlines()]
+                for line in f:
+                    line = self._remove_comments(line.strip().lower())
+                    if line:
+                        result.append(line)
 
         except FileNotFoundError:
             self._log.error("Can not find vscodefile: {}".format(vsfile))
